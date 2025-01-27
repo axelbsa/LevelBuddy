@@ -22,14 +22,16 @@ bl_info = {
     "category": "Generic",
 }
 
-from . addon import operators, panels
+from . addon import operators, panels, properties
 
 
 def register():
+    properties.register()
     operators.register()
     panels.register()
 
 
 def unregister():
+    properties.unregister()
     operators.unregister()
     panels.unregister()

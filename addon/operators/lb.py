@@ -1,4 +1,8 @@
-import bpy, blf, bmesh
+import bpy
+import blf
+import bmesh
+
+from bpy_extras.io_utils import ImportHelper
 
 
 def translate(val, t):
@@ -73,17 +77,8 @@ def remove_material(obj):
     pass
 
 
-class LB_OT_HelloWorld(bpy.types.Operator):
-    bl_idname = "LB_OT_HelloWorld"
-    bl_label = "Build Lightmaps"
-    bl_description = "Build Lightmaps"
-    bl_options = {'REGISTER', 'UNDO'}
-    
-    def execute(self, context):
-        pass
-
 class LB_OT_NewGeometry(bpy.types.Operator):
-    bl_idname = "LB_OT_new_geometry"
+    bl_idname = "scene.lb_new_geometry"
     bl_label = "Level New Geometry"
 
     brush_type: bpy.props.StringProperty(name="brush_type", default='NONE')
@@ -126,7 +121,7 @@ class LB_OT_NewGeometry(bpy.types.Operator):
         return {"FINISHED"}
     
 class LB_OT_RipGeometry(bpy.types.Operator):
-    bl_idname = "LB_OT_RipGeometry"
+    bl_idname = "object.lb_rip_geometry"
     bl_label = "Level Rip Sector"
 
     remove_geometry: bpy.props.BoolProperty(name="remove_geometry", default=False)
@@ -223,7 +218,7 @@ class LB_OT_RipGeometry(bpy.types.Operator):
         return {"FINISHED"}
 
 class LB_OT_BuildMap(bpy.types.Operator):
-    bl_idname = "LB_OT_BuildMap"
+    bl_idname = "scene.lb_build_map"
     bl_label = "Build Map"
 
     bool_op: bpy.props.StringProperty(
@@ -313,7 +308,7 @@ class LB_OT_BuildMap(bpy.types.Operator):
         return {"FINISHED"}
     
 class LB_OT_OpenMaterial(bpy.types.Operator, ImportHelper):
-    bl_idname = "LB_OT_OpenMaterial"
+    bl_idname = "scene.lb_open_material"
     bl_label = "Open Material"
 
     filter_glob: bpy.props.StringProperty(

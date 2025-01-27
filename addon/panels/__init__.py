@@ -3,7 +3,7 @@ from bpy.utils import register_class, unregister_class
 from . import panels
 
 classes = [
-    panels.LB_MainPanel
+    panels.LB_PT_MainPanel
 ]
 
 def register():
