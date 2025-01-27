@@ -3,7 +3,11 @@ from bpy.utils import register_class, unregister_class
 from . import lb
 
 classes = [
-    lb.LB_HelloWorld,
+    lb.LB_OT_HelloWorld,
+    lb.LB_OT_NewGeometry,
+    lb.LB_OT_RipGeometry,
+    lb.LB_OT_BuildMap,
+    lb.LB_OT_BuildMap,
 ]
 
 def register():
