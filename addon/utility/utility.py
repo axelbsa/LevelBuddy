@@ -336,31 +336,74 @@ def remove_material(obj):
             bpy.ops.object.material_slot_remove()
 
 
+""" def update_sector_lighting(ob):
+    mesh = ob.data; 
+    color_layer = mesh.vertex_colors.active
+    light_value = ob.sector_light_value
+    light_type = 1.0
+    if ob.sector_light_type == "NONE":
+        light_type = 1.0
+    if ob.sector_light_type == "PULSE":
+        light_type = 0.0
+    if ob.sector_light_type == "FLICKER":
+        light_type = 0.1
+    if ob.sector_light_type == "SWITCH 1":
+        light_type = 0.2
+    if ob.sector_light_type == "SWITCH 2":
+        light_type = 0.3
+    if ob.sector_light_type == "SWITCH 3":
+        light_type = 0.4
+    if ob.sector_light_type == "SWITCH 4":
+        light_type = 0.5
+    if ob.sector_light_type == "BLINK":
+        light_type = 0.6
+    light_max = ob.sector_light_max
+    rgb = (light_value, light_type, light_max)
+    if not mesh.vertex_colors:
+        mesh.vertex_colors.new()
+    for v in color_layer.data:
+        v.color = rgb """
+    # pass
+
+
 def update_sector_lighting(ob):
-    # mesh = ob.data
-    # color_layer = mesh.vertex_colors.active
-    # light_value = ob.sector_light_value
-    # light_type = 1.0
-    # if ob.sector_light_type == "NONE":
-    #     light_type = 1.0
-    # if ob.sector_light_type == "PULSE":
-    #     light_type = 0.0
-    # if ob.sector_light_type == "FLICKER":
-    #     light_type = 0.1
-    # if ob.sector_light_type == "SWITCH 1":
-    #     light_type = 0.2
-    # if ob.sector_light_type == "SWITCH 2":
-    #     light_type = 0.3
-    # if ob.sector_light_type == "SWITCH 3":
-    #     light_type = 0.4
-    # if ob.sector_light_type == "SWITCH 4":
-    #     light_type = 0.5
-    # if ob.sector_light_type == "BLINK":
-    #     light_type = 0.6
-    # light_max = ob.sector_light_max
-    # rgb = (light_value, light_type, light_max)
-    # if not mesh.vertex_colors:
-    #     mesh.vertex_colors.new()
-    # for v in color_layer.data:
-    #     v.color = rgb
-    pass
+    mesh = ob.data
+
+    # Define the color attribute name
+    color_attribute_name = "Col"
+
+    # Create or get the color attribute
+    if color_attribute_name not in mesh.color_attributes:
+        color_attribute = mesh.color_attributes.new(name=color_attribute_name, type='FLOAT_COLOR', domain='CORNER')
+    else:
+        color_attribute = mesh.color_attributes[color_attribute_name]
+
+    # Access the data of the attribute
+    colors = color_attribute.data
+
+    # Calculate light values
+    light_value = ob.sector_light_value
+    light_type = 1.0
+    if ob.sector_light_type == "NONE":
+        light_type = 1.0
+    elif ob.sector_light_type == "PULSE":
+        light_type = 0.0
+    elif ob.sector_light_type == "FLICKER":
+        light_type = 0.1
+    elif ob.sector_light_type == "SWITCH 1":
+        light_type = 0.2
+    elif ob.sector_light_type == "SWITCH 2":
+        light_type = 0.3
+    elif ob.sector_light_type == "SWITCH 3":
+        light_type = 0.4
+    elif ob.sector_light_type == "SWITCH 4":
+        light_type = 0.5
+    elif ob.sector_light_type == "BLINK":
+        light_type = 0.6
+
+    light_max = ob.sector_light_max
+    rgb = (light_value, light_type, light_max)
+
+    # Set the color for each vertex corner (loop)
+    for v in colors:
+        v.color = (*rgb, 1.0)  # Add alpha channel if needed    
