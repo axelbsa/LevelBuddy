@@ -1,8 +1,16 @@
 import bpy
 import blf
 import bmesh
+import math
+
+from copy import copy
 
 from bpy_extras.io_utils import ImportHelper
+
+csg_operation_to_blender_boolean = {
+    "ADD": "UNION",
+    "SUBTRACT": "DIFFERENCE"
+}
 
 
 def dump(obj):
@@ -31,6 +39,9 @@ def auto_texture(bool_obj, source_obj):
     mesh = bool_obj.data
     objectLocation = source_obj.location
     objectScale = source_obj.scale
+
+    lb_source_obj = source_obj.lb_ObjectProperties
+    lb_bool_obj = bool_obj.lb_ObjectProperties
 
     bm = bmesh.new()
     bm.from_mesh(mesh)
@@ -68,39 +79,39 @@ def auto_texture(bool_obj, source_obj):
             if faceDirection == "x":
                 luv.uv.x = ((l.vert.co.y * objectScale[1]) + objectLocation[1])
                 luv.uv.y = ((l.vert.co.z * objectScale[2]) + objectLocation[2])
-                luv.uv = rotate2D(luv.uv, source_obj.wall_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.wall_texture_scale_offset[0]), source_obj.wall_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.wall_texture_scale_offset[1]), source_obj.wall_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.wall_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.wall_texture_scale_offset[0]), lb_source_obj.wall_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.wall_texture_scale_offset[1]), lb_source_obj.wall_texture_scale_offset[3])
             if faceDirection == "-x":
                 luv.uv.x = ((l.vert.co.y * objectScale[1]) + objectLocation[1])
                 luv.uv.y = ((l.vert.co.z * objectScale[2]) + objectLocation[2])
-                luv.uv = rotate2D(luv.uv, source_obj.wall_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.wall_texture_scale_offset[0]), source_obj.wall_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.wall_texture_scale_offset[1]), source_obj.wall_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.wall_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.wall_texture_scale_offset[0]), lb_source_obj.wall_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.wall_texture_scale_offset[1]), lb_source_obj.wall_texture_scale_offset[3])
             if faceDirection == "y":
                 luv.uv.x = ((l.vert.co.x * objectScale[0]) + objectLocation[0])
                 luv.uv.y = ((l.vert.co.z * objectScale[2]) + objectLocation[2])
-                luv.uv = rotate2D(luv.uv, source_obj.wall_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.wall_texture_scale_offset[0]), source_obj.wall_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.wall_texture_scale_offset[1]), source_obj.wall_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.wall_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.wall_texture_scale_offset[0]), lb_source_obj.wall_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.wall_texture_scale_offset[1]), lb_source_obj.wall_texture_scale_offset[3])
             if faceDirection == "-y":
                 luv.uv.x = ((l.vert.co.x * objectScale[0]) + objectLocation[0])
                 luv.uv.y = ((l.vert.co.z * objectScale[2]) + objectLocation[2])
-                luv.uv = rotate2D(luv.uv, source_obj.wall_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.wall_texture_scale_offset[0]), source_obj.wall_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.wall_texture_scale_offset[1]), source_obj.wall_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.wall_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.wall_texture_scale_offset[0]), lb_source_obj.wall_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.wall_texture_scale_offset[1]), lb_source_obj.wall_texture_scale_offset[3])
             if faceDirection == "z":
                 luv.uv.x = ((l.vert.co.x * objectScale[0]) + objectLocation[0])
                 luv.uv.y = ((l.vert.co.y * objectScale[1]) + objectLocation[1])
-                luv.uv = rotate2D(luv.uv, source_obj.ceiling_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.ceiling_texture_scale_offset[0]), source_obj.ceiling_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.ceiling_texture_scale_offset[1]), source_obj.ceiling_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.ceiling_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.ceiling_texture_scale_offset[0]), lb_source_obj.ceiling_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.ceiling_texture_scale_offset[1]), lb_source_obj.ceiling_texture_scale_offset[3])
             if faceDirection == "-z":
                 luv.uv.x = ((l.vert.co.x * objectScale[0]) + objectLocation[0])
                 luv.uv.y = ((l.vert.co.y * objectScale[1]) + objectLocation[1])
-                luv.uv = rotate2D(luv.uv, source_obj.floor_texture_rotation)
-                luv.uv.x =  translate(scale(luv.uv.x, source_obj.floor_texture_scale_offset[0]), source_obj.floor_texture_scale_offset[2])
-                luv.uv.y =  translate(scale(luv.uv.y, source_obj.floor_texture_scale_offset[1]), source_obj.floor_texture_scale_offset[3])
+                luv.uv = rotate2D(luv.uv, lb_source_obj.floor_texture_rotation)
+                luv.uv.x =  translate(scale(luv.uv.x, lb_source_obj.floor_texture_scale_offset[0]), lb_source_obj.floor_texture_scale_offset[2])
+                luv.uv.y =  translate(scale(luv.uv.y, lb_source_obj.floor_texture_scale_offset[1]), lb_source_obj.floor_texture_scale_offset[3])
     bm.to_mesh(mesh)
     bm.free()
 
@@ -108,9 +119,10 @@ def auto_texture(bool_obj, source_obj):
 
 
 def update_location_precision(ob):
-    ob.location.x = round(ob.location.x, bpy.context.scene.map_precision)
-    ob.location.y = round(ob.location.y, bpy.context.scene.map_precision)
-    ob.location.z = round(ob.location.z, bpy.context.scene.map_precision)
+    scn = bpy.context.scene.lb_SceneProperties
+    ob.location.x = round(ob.location.x, scn.map_precision)
+    ob.location.y = round(ob.location.y, scn.map_precision)
+    ob.location.z = round(ob.location.z, scn.map_precision)
     cleanup_vertex_precision(ob)
 
 
@@ -125,12 +137,12 @@ def _update_sector_solidify(self, context):
     ob = context.active_object
     if ob.modifiers:
         mod = ob.modifiers[0]
-        mod.thickness = ob.ceiling_height - ob.floor_height
-        mod.offset = 1 + ob.floor_height / (mod.thickness / 2)
+        mod.thickness = ob.lb_ObjectProperties.ceiling_height - ob.lb_ObjectProperties.floor_height
+        mod.offset = 1 + ob.lb_ObjectProperties.floor_height / (mod.thickness / 2)
 
 
 def update_brush_sector_modifier(ob):
-    if ob.brush_type == 'BRUSH':
+    if ob.lb_ObjectProperties.brush_type == 'BRUSH':
         for mod in ob.modifiers:
             if mod.type == 'SOLIDIFY':
                 ob.modifiers.remove(mod)
@@ -150,8 +162,8 @@ def update_brush_sector_modifier(ob):
             mod.use_even_offset = True
             mod.use_quality_normals = True
             mod.use_even_offset = True
-            mod.thickness = ob.ceiling_height - ob.floor_height
-            mod.offset = 1 + ob.floor_height / (mod.thickness / 2)
+            mod.thickness = ob.lb_ObjectProperties.ceiling_height - ob.lb_ObjectProperties.floor_height
+            mod.offset = 1 + ob.lb_ObjectProperties.floor_height / (mod.thickness / 2)
             mod.material_offset = 1
             mod.material_offset_rim = 2
             break
@@ -163,12 +175,12 @@ def update_brush_sector_materials(ob):
     while len(ob.material_slots) > 3:
         bpy.ops.object.material_slot_remove()
 
-    if bpy.data.materials.find(ob.ceiling_texture) != -1:
-        ob.material_slots[0].material = bpy.data.materials[ob.ceiling_texture]
-    if bpy.data.materials.find(ob.floor_texture) != -1:
-        ob.material_slots[1].material = bpy.data.materials[ob.floor_texture]
-    if bpy.data.materials.find(ob.wall_texture) != -1:
-        ob.material_slots[2].material = bpy.data.materials[ob.wall_texture]
+    if bpy.data.materials.find(ob.lb_ObjectProperties.ceiling_texture) != -1:
+        ob.material_slots[0].material = bpy.data.materials[ob.lb_ObjectProperties.ceiling_texture]
+    if bpy.data.materials.find(ob.lb_ObjectProperties.floor_texture) != -1:
+        ob.material_slots[1].material = bpy.data.materials[ob.lb_ObjectProperties.floor_texture]
+    if bpy.data.materials.find(ob.lb_ObjectProperties.wall_texture) != -1:
+        ob.material_slots[2].material = bpy.data.materials[ob.lb_ObjectProperties.wall_texture]
 
 
 # def update_brush_sector_materials(ob):
@@ -212,17 +224,18 @@ def update_brush(obj):
 
         update_brush_sector_modifier(obj)
 
-        if obj.brush_type == 'SECTOR':
+        if obj.lb_ObjectProperties.brush_type == 'SECTOR':
             update_brush_sector_materials(obj)
 
         update_location_precision(obj)
 
 
 def cleanup_vertex_precision(ob):
+    scn = bpy.context.scene.lb_SceneProperties
     for v in ob.data.vertices:
-        v.co.x = round(v.co.x, bpy.context.scene.map_precision)
-        v.co.y = round(v.co.y, bpy.context.scene.map_precision)
-        v.co.z = round(v.co.z, bpy.context.scene.map_precision)
+        v.co.x = round(v.co.x, scn.map_precision)
+        v.co.y = round(v.co.y, scn.map_precision)
+        v.co.z = round(v.co.z, scn.map_precision)
 
 
 def apply_csg(target, source_obj, bool_obj):
@@ -231,9 +244,11 @@ def apply_csg(target, source_obj, bool_obj):
 
     copy_materials(target, source_obj)
 
+    lb_source_obj = source_obj.lb_ObjectProperties
+
     mod = target.modifiers.new(name=source_obj.name, type='BOOLEAN')
     mod.object = bool_obj
-    mod.operation = csg_operation_to_blender_boolean[source_obj.csg_operation]
+    mod.operation = csg_operation_to_blender_boolean[lb_source_obj.csg_operation]
     mod.solver = 'EXACT'
     bpy.ops.object.modifier_apply(modifier=source_obj.name)
 
@@ -301,11 +316,11 @@ def copy_transforms(a, b):
 
 def remove_material(obj):
     scn = bpy.context.scene
-    if scn.remove_material is not "":
+    if scn.lb_SceneProperties.remove_material is not "":
         i = 0
         remove = False
         for m in obj.material_slots:
-            if scn.remove_material == m.name:
+            if scn.lb_SceneProperties.remove_material == m.name:
                 remove = True
             else:
                 if not remove:
@@ -319,3 +334,33 @@ def remove_material(obj):
             bpy.ops.mesh.delete(type='FACE')
             bpy.ops.object.editmode_toggle()
             bpy.ops.object.material_slot_remove()
+
+
+def update_sector_lighting(ob):
+    # mesh = ob.data
+    # color_layer = mesh.vertex_colors.active
+    # light_value = ob.sector_light_value
+    # light_type = 1.0
+    # if ob.sector_light_type == "NONE":
+    #     light_type = 1.0
+    # if ob.sector_light_type == "PULSE":
+    #     light_type = 0.0
+    # if ob.sector_light_type == "FLICKER":
+    #     light_type = 0.1
+    # if ob.sector_light_type == "SWITCH 1":
+    #     light_type = 0.2
+    # if ob.sector_light_type == "SWITCH 2":
+    #     light_type = 0.3
+    # if ob.sector_light_type == "SWITCH 3":
+    #     light_type = 0.4
+    # if ob.sector_light_type == "SWITCH 4":
+    #     light_type = 0.5
+    # if ob.sector_light_type == "BLINK":
+    #     light_type = 0.6
+    # light_max = ob.sector_light_max
+    # rgb = (light_value, light_type, light_max)
+    # if not mesh.vertex_colors:
+    #     mesh.vertex_colors.new()
+    # for v in color_layer.data:
+    #     v.color = rgb
+    pass

@@ -1,5 +1,4 @@
 import bpy
-import blf
 import bmesh
 
 from bpy_extras.io_utils import ImportHelper
@@ -160,8 +159,10 @@ class LB_OT_BuildMap(bpy.types.Operator):
     def execute(self, context):
         scn = bpy.context.scene.lb_SceneProperties
         was_edit_mode = False
+        
         old_active = bpy.context.active_object
         old_selected = bpy.context.selected_objects.copy()
+
         if bpy.context.mode == 'EDIT_MESH':
             bpy.ops.object.mode_set(mode='OBJECT')
             was_edit_mode = True
@@ -171,8 +172,12 @@ class LB_OT_BuildMap(bpy.types.Operator):
 
         level_map = create_new_boolean_object(scn, "LevelGeometry")
         level_map.data = bpy.data.meshes.new("LevelGeometryMesh")
-        level_map.data.use_auto_smooth = scn.map_use_auto_smooth
-        level_map.data.auto_smooth_angle = math.radians(scn.map_auto_smooth_angle)
+
+        # TODO: XXX Fix auto smoothing
+        #level_map.shade_auto_smooth(
+        #    use_auto_smooth=scn.map_use_auto_smooth,
+        #    angle=math.radians(scn.map_auto_smooth_angle))
+        
         level_map.hide_select = True
         level_map.hide_set(False)
 
@@ -182,16 +187,16 @@ class LB_OT_BuildMap(bpy.types.Operator):
             if not ob:
                 continue
 
-            if ob != level_map and ob.brush_type != 'NONE':
+            if ob != level_map and ob.lb_ObjectProperties.brush_type != 'NONE':
                 update_brush(ob)
 
-                if brush_dictionary_list.get(ob.csg_order, None) == None:
-                    brush_dictionary_list[ob.csg_order] = []
+                if brush_dictionary_list.get(ob.lb_ObjectProperties.csg_order, None) == None:
+                    brush_dictionary_list[ob.lb_ObjectProperties.csg_order] = []
 
-                if ob.csg_order not in brush_orders_sorted_list:
-                    brush_orders_sorted_list.append(ob.csg_order)
+                if ob.lb_ObjectProperties.csg_order not in brush_orders_sorted_list:
+                    brush_orders_sorted_list.append(ob.lb_ObjectProperties.csg_order)
 
-                brush_dictionary_list[ob.csg_order].append(ob)
+                brush_dictionary_list[ob.lb_ObjectProperties.csg_order].append(ob)
 
         brush_orders_sorted_list.sort()
         bpy.context.view_layer.objects.active = level_map
@@ -200,10 +205,10 @@ class LB_OT_BuildMap(bpy.types.Operator):
         for order in brush_orders_sorted_list:
             brush_list = brush_dictionary_list[order]
             for brush in brush_list:
-                brush.name = brush.csg_operation + "[" + str(order) + "]" + str(name_index)
+                brush.name = brush.lb_ObjectProperties.csg_operation + "[" + str(order) + "]" + str(name_index)
                 name_index += 1
                 bool_obj = build_bool_object(brush)
-                if brush.brush_auto_texture:
+                if brush.lb_ObjectProperties.brush_auto_texture:
                     auto_texture(bool_obj, brush)
                 apply_csg(level_map, brush, bool_obj)
 
@@ -211,7 +216,7 @@ class LB_OT_BuildMap(bpy.types.Operator):
 
         update_location_precision(level_map)
 
-        if bpy.context.scene.map_flip_normals:
+        if bpy.context.scene.lb_SceneProperties.map_flip_normals:
             flip_object_normals(level_map)
 
         # restore context
