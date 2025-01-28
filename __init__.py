@@ -12,14 +12,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 bl_info = {
-    "name": "Levelbuddy",
-    "author": "Axel Sanner",
+    "name": "Level buddy",
+    "author": "Matt Lucas, HickVieira, Axel Sanner (Blender 4.2+)",
     "description": "",
     "blender": (4, 2, 0),
-    "version": (0, 0, 1),
-    "location": "",
+    "version": (1, 6, 0),
+    "location": "View3D > Tools > Level Buddy",
     "warning": "",
-    "category": "Generic",
+    "category": "Object",
 }
 
 from . addon import operators, panels, properties

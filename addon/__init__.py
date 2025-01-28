@@ -1,1 +1,1 @@
-__all__ = ('Properties', 'Operators', 'Panels')
+__all__ = ('Properties', 'Operators', 'Panels', 'Utility')

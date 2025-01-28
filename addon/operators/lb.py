@@ -3,78 +3,7 @@ import blf
 import bmesh
 
 from bpy_extras.io_utils import ImportHelper
-
-
-def translate(val, t):
-    pass
-
-
-def scale(val, s):
-    pass
-
-
-def rotate2D(uv, degrees):
-    pass
-
-
-def auto_texture(bool_obj, source_obj):
-    pass
-
-
-def update_location_precision(ob):
-    pass
-
-
-def freeze_transforms(ob):
-    pass
-
-
-def _update_sector_solidify(self, context):
-    pass
-
-
-def update_brush_sector_modifier(ob):
-    pass
-
-
-def update_brush_sector_materials(ob):
-    pass
-
-
-def update_brush(obj):
-    pass
-
-
-def cleanup_vertex_precision(ob):
-    pass
-
-
-def apply_csg(target, source_obj, bool_obj):
-    pass
-
-
-def build_bool_object(sourceObj):
-    pass
-
-
-def flip_object_normals(ob):
-    pass
-
-
-def create_new_boolean_object(scn, name):
-    pass
-
-
-def copy_materials(target, source):
-    pass
-
-
-def copy_transforms(a, b):
-    pass
-
-
-def remove_material(obj):
-    pass
+from ..utility.utility import *
 
 
 class LB_OT_NewGeometry(bpy.types.Operator):
@@ -84,7 +13,7 @@ class LB_OT_NewGeometry(bpy.types.Operator):
     brush_type: bpy.props.StringProperty(name="brush_type", default='NONE')
 
     def execute(self, context):
-        scn = bpy.context.scene
+        scn = bpy.context.scene.lb_SceneProperties
         bpy.ops.object.select_all(action='DESELECT')
 
         if self.brush_type == 'SECTOR':
@@ -93,28 +22,30 @@ class LB_OT_NewGeometry(bpy.types.Operator):
             bpy.ops.mesh.primitive_cube_add(size=2)
 
         ob = bpy.context.active_object
+        lb_ob = bpy.context.active_object.lb_ObjectProperties
 
-        ob.csg_operation = 'ADD'
+        lb_ob.csg_operation = 'ADD'
 
         ob.display_type = 'WIRE'
         ob.name = self.brush_type
         ob.data.name = self.brush_type
-        ob.brush_type = self.brush_type
-        ob.csg_order = 0
-        ob.brush_auto_texture = True
+
+        lb_ob.brush_type = self.brush_type
+        lb_ob.csg_order = 0
+        lb_ob.brush_auto_texture = True
         bpy.context.view_layer.objects.active = ob
 
-        ob.ceiling_height = 4
-        ob.floor_height = 0
-        ob.ceiling_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
-        ob.wall_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
-        ob.floor_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
-        ob.ceiling_texture_rotation = 0
-        ob.wall_texture_rotation = 0
-        ob.floor_texture_rotation = 0
-        ob.ceiling_texture = ""
-        ob.wall_texture = ""
-        ob.floor_texture = ""
+        lb_ob.ceiling_height = 4
+        lb_ob.floor_height = 0
+        lb_ob.ceiling_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
+        lb_ob.wall_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
+        lb_ob.floor_texture_scale_offset = (1.0, 1.0, 0.0, 0.0)
+        lb_ob.ceiling_texture_rotation = 0
+        lb_ob.wall_texture_rotation = 0
+        lb_ob.floor_texture_rotation = 0
+        lb_ob.ceiling_texture = ""
+        lb_ob.wall_texture = ""
+        lb_ob.floor_texture = ""
 
         update_brush(ob)
 
@@ -227,7 +158,7 @@ class LB_OT_BuildMap(bpy.types.Operator):
     )
 
     def execute(self, context):
-        scn = bpy.context.scene
+        scn = bpy.context.scene.lb_SceneProperties
         was_edit_mode = False
         old_active = bpy.context.active_object
         old_selected = bpy.context.selected_objects.copy()

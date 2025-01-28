@@ -2,6 +2,8 @@ import bpy
 from bpy.props import (IntProperty, BoolProperty, FloatProperty, StringProperty,
                        FloatVectorProperty, EnumProperty)
 
+from ..utility.utility import _update_sector_solidify
+
 
 class LB_ObjectProperties(bpy.types.PropertyGroup):
     ceiling_texture_scale_offset: FloatVectorProperty(

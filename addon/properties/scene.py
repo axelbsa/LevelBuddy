@@ -1,6 +1,8 @@
 import bpy
 from bpy.props import IntProperty, BoolProperty, FloatProperty, StringProperty
 
+from ..utility import *
+
 class LB_SceneProperties(bpy.types.PropertyGroup):
 
     map_precision: IntProperty(

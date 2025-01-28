@@ -6,6 +6,7 @@ classes = [
     lb.LB_OT_NewGeometry,
     lb.LB_OT_RipGeometry,
     lb.LB_OT_BuildMap,
+    lb.LB_OT_OpenMaterial,
 ]
 
 def register():
