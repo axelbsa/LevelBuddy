@@ -22,7 +22,7 @@ bl_info = {
     "category": "Object",
 }
 
-from . addon import operators, panels, properties
+from .addon import operators, panels, properties
 
 
 def register():
