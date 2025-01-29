@@ -1,11 +1,12 @@
-import bpy, blf, bmesh
+import bpy
+
 
 class LB_PT_MainPanel(bpy.types.Panel):
     bl_label = "Level Buddy"
     bl_idname = "LB_PT_MainPanel"
     bl_space_type = "VIEW_3D"
-    bl_region_type = 'UI'
-    bl_category = 'Level Buddy'
+    bl_region_type = "UI"
+    bl_category = "Level Buddy"
 
     def draw(self, context):
         ob = bpy.context.active_object
@@ -21,17 +22,25 @@ class LB_PT_MainPanel(bpy.types.Panel):
         col.prop_search(scn, "remove_material", bpy.data, "materials")
 
         col = layout.column(align=True)
-        col.operator("scene.lb_build_map", text="Build Map", icon="MOD_BUILD").bool_op = "UNION"
+        col.operator(
+            "scene.lb_build_map", text="Build Map", icon="MOD_BUILD"
+        ).bool_op = "UNION"
         col.operator("scene.lb_open_material", text="Open Material", icon="TEXTURE")
-        
+
         col = layout.column(align=True)
         col.label(icon="SNAP_PEEL_OBJECT", text="Tools")
-        
-        if bpy.context.mode == 'EDIT_MESH':
-            col.operator("object.lb_rip_geometry", text="Rip", icon="UNLINKED").remove_geometry = True
+
+        if bpy.context.mode == "EDIT_MESH":
+            col.operator(
+                "object.lb_rip_geometry", text="Rip", icon="UNLINKED"
+            ).remove_geometry = True
         else:
-            col.operator("scene.lb_new_geometry", text="New Sector", icon="MESH_PLANE").brush_type = 'SECTOR'
-            col.operator("scene.lb_new_geometry", text="New Brush", icon="CUBE").brush_type = 'BRUSH'
+            col.operator(
+                "scene.lb_new_geometry", text="New Sector", icon="MESH_PLANE"
+            ).brush_type = "SECTOR"
+            col.operator(
+                "scene.lb_new_geometry", text="New Brush", icon="CUBE"
+            ).brush_type = "BRUSH"
 
         if ob is not None and len(bpy.context.selected_objects) > 0:
             col = layout.column(align=True)
@@ -61,7 +70,7 @@ class LB_PT_MainPanel(bpy.types.Panel):
                 col = layout.row(align=True)
                 col.prop(ob.lb_ObjectProperties, "floor_texture_rotation")
 
-            if ob.lb_ObjectProperties.brush_type == 'SECTOR' and ob.modifiers:
+            if ob.lb_ObjectProperties.brush_type == "SECTOR" and ob.modifiers:
                 col = layout.column(align=True)
                 col.label(icon="MOD_ARRAY", text="Sector Properties")
 
@@ -70,6 +79,27 @@ class LB_PT_MainPanel(bpy.types.Panel):
 
                 # layout.separator()
                 col = layout.column(align=True)
-                col.prop_search(ob.lb_ObjectProperties, "ceiling_texture", bpy.data, "materials", icon="MATERIAL", text="Ceiling")
-                col.prop_search(ob.lb_ObjectProperties, "wall_texture", bpy.data, "materials", icon="MATERIAL", text="Wall")
-                col.prop_search(ob.lb_ObjectProperties, "floor_texture", bpy.data, "materials", icon="MATERIAL", text="Floor")
+                col.prop_search(
+                    ob.lb_ObjectProperties,
+                    "ceiling_texture",
+                    bpy.data,
+                    "materials",
+                    icon="MATERIAL",
+                    text="Ceiling",
+                )
+                col.prop_search(
+                    ob.lb_ObjectProperties,
+                    "wall_texture",
+                    bpy.data,
+                    "materials",
+                    icon="MATERIAL",
+                    text="Wall",
+                )
+                col.prop_search(
+                    ob.lb_ObjectProperties,
+                    "floor_texture",
+                    bpy.data,
+                    "materials",
+                    icon="MATERIAL",
+                    text="Floor",
+                )

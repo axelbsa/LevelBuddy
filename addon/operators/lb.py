@@ -9,13 +9,13 @@ class LB_OT_NewGeometry(bpy.types.Operator):
     bl_idname = "scene.lb_new_geometry"
     bl_label = "Level New Geometry"
 
-    brush_type: bpy.props.StringProperty(name="brush_type", default='NONE')
+    brush_type: bpy.props.StringProperty(name="brush_type", default="NONE")
 
     def execute(self, context):
         scn = bpy.context.scene.lb_SceneProperties
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_all(action="DESELECT")
 
-        if self.brush_type == 'SECTOR':
+        if self.brush_type == "SECTOR":
             bpy.ops.mesh.primitive_plane_add(size=2)
         else:
             bpy.ops.mesh.primitive_cube_add(size=2)
@@ -23,9 +23,9 @@ class LB_OT_NewGeometry(bpy.types.Operator):
         ob = bpy.context.active_object
         lb_ob = bpy.context.active_object.lb_ObjectProperties
 
-        lb_ob.csg_operation = 'ADD'
+        lb_ob.csg_operation = "ADD"
 
-        ob.display_type = 'WIRE'
+        ob.display_type = "WIRE"
         ob.name = self.brush_type
         ob.data.name = self.brush_type
 
@@ -49,7 +49,8 @@ class LB_OT_NewGeometry(bpy.types.Operator):
         update_brush(ob)
 
         return {"FINISHED"}
-    
+
+
 class LB_OT_RipGeometry(bpy.types.Operator):
     bl_idname = "object.lb_rip_geometry"
     bl_label = "Level Rip Sector"
@@ -101,7 +102,11 @@ class LB_OT_RipGeometry(bpy.types.Operator):
             return {"CANCELLED"}
 
         # remove riped
-        if active_obj.brush_type != 'BRUSH' and self.remove_geometry and len(selected_faces) > 0:
+        if (
+            active_obj.brush_type != "BRUSH"
+            and self.remove_geometry
+            and len(selected_faces) > 0
+        ):
             edges_to_remove = []
             for f in selected_faces:
                 for e in f.edges:
@@ -120,16 +125,16 @@ class LB_OT_RipGeometry(bpy.types.Operator):
         active_obj_bm.faces.ensure_lookup_table()
 
         # create mesh
-        riped_mesh = bpy.data.meshes.new(name='riped_mesh')
+        riped_mesh = bpy.data.meshes.new(name="riped_mesh")
         mat = active_obj.matrix_world
         if len(py_faces) > 0:
             riped_mesh.from_pydata([x.co for x in py_verts], [], py_faces)
         else:
             riped_mesh.from_pydata([x.co for x in py_verts], py_edges, [])
 
-        bpy.ops.mesh.select_all(action='DESELECT')
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.mesh.select_all(action="DESELECT")
+        bpy.ops.object.mode_set(mode="OBJECT")
+        bpy.ops.object.select_all(action="DESELECT")
 
         riped_obj = active_obj.copy()
         for coll in active_obj.users_collection:
@@ -139,32 +144,30 @@ class LB_OT_RipGeometry(bpy.types.Operator):
 
         riped_obj.select_set(True)
         bpy.context.view_layer.objects.active = riped_obj
-        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode="EDIT")
 
-        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.select_all(action="SELECT")
 
         riped_obj_bm.free()
 
         return {"FINISHED"}
 
+
 class LB_OT_BuildMap(bpy.types.Operator):
     bl_idname = "scene.lb_build_map"
     bl_label = "Build Map"
 
-    bool_op: bpy.props.StringProperty(
-        name="bool_op",
-        default="UNION"
-    )
+    bool_op: bpy.props.StringProperty(name="bool_op", default="UNION")
 
     def execute(self, context):
         scn = bpy.context.scene.lb_SceneProperties
         was_edit_mode = False
-        
+
         old_active = bpy.context.active_object
         old_selected = bpy.context.selected_objects.copy()
 
-        if bpy.context.mode == 'EDIT_MESH':
-            bpy.ops.object.mode_set(mode='OBJECT')
+        if bpy.context.mode == "EDIT_MESH":
+            bpy.ops.object.mode_set(mode="OBJECT")
             was_edit_mode = True
 
         brush_dictionary_list = {}
@@ -174,23 +177,25 @@ class LB_OT_BuildMap(bpy.types.Operator):
         level_map.data = bpy.data.meshes.new("LevelGeometryMesh")
 
         # TODO: XXX Fix auto smoothing
-        #level_map.shade_auto_smooth(
+        # level_map.shade_auto_smooth(
         #    use_auto_smooth=scn.map_use_auto_smooth,
         #    angle=math.radians(scn.map_auto_smooth_angle))
-        
+
         level_map.hide_select = True
         level_map.hide_set(False)
 
         visible_objects = bpy.context.scene.collection.all_objects
         for ob in visible_objects:
-
             if not ob:
                 continue
 
-            if ob != level_map and ob.lb_ObjectProperties.brush_type != 'NONE':
+            if ob != level_map and ob.lb_ObjectProperties.brush_type != "NONE":
                 update_brush(ob)
 
-                if brush_dictionary_list.get(ob.lb_ObjectProperties.csg_order, None) == None:
+                if (
+                    brush_dictionary_list.get(ob.lb_ObjectProperties.csg_order, None)
+                    == None
+                ):
                     brush_dictionary_list[ob.lb_ObjectProperties.csg_order] = []
 
                 if ob.lb_ObjectProperties.csg_order not in brush_orders_sorted_list:
@@ -205,7 +210,13 @@ class LB_OT_BuildMap(bpy.types.Operator):
         for order in brush_orders_sorted_list:
             brush_list = brush_dictionary_list[order]
             for brush in brush_list:
-                brush.name = brush.lb_ObjectProperties.csg_operation + "[" + str(order) + "]" + str(name_index)
+                brush.name = (
+                    brush.lb_ObjectProperties.csg_operation
+                    + "["
+                    + str(order)
+                    + "]"
+                    + str(name_index)
+                )
                 name_index += 1
                 bool_obj = build_bool_object(brush)
                 if brush.lb_ObjectProperties.brush_auto_texture:
@@ -220,12 +231,12 @@ class LB_OT_BuildMap(bpy.types.Operator):
             flip_object_normals(level_map)
 
         # restore context
-        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_all(action="DESELECT")
         if old_active:
             old_active.select_set(True)
             bpy.context.view_layer.objects.active = old_active
         if was_edit_mode:
-            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.object.mode_set(mode="EDIT")
         for obj in old_selected:
             if obj:
                 obj.select_set(True)
@@ -242,19 +253,19 @@ class LB_OT_BuildMap(bpy.types.Operator):
         #         bpy.data.materials.remove(m)
 
         return {"FINISHED"}
-    
+
+
 class LB_OT_OpenMaterial(bpy.types.Operator, ImportHelper):
     bl_idname = "scene.lb_open_material"
     bl_label = "Open Material"
 
     filter_glob: bpy.props.StringProperty(
-        default='*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.bmp',
-        options={'HIDDEN'}
+        default="*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.bmp", options={"HIDDEN"}
     )
 
     files: bpy.props.CollectionProperty(
         type=bpy.types.OperatorFileListElement,
-        options={'HIDDEN', 'SKIP_SAVE'},
+        options={"HIDDEN", "SKIP_SAVE"},
     )
 
     def execute(self, context):
@@ -272,25 +283,31 @@ class LB_OT_OpenMaterial(bpy.types.Operator, ImportHelper):
                 new_material = bpy.data.materials.new(new_material_name)
 
             new_material.use_nodes = True
-            new_material.preview_render_type = 'FLAT'
+            new_material.preview_render_type = "FLAT"
 
             # We clear it as we'll define it completely
             new_material.node_tree.links.clear()
             new_material.node_tree.nodes.clear()
 
             # create nodes
-            bsdfNode = new_material.node_tree.nodes.new('ShaderNodeBsdfPrincipled')
-            outputNode = new_material.node_tree.nodes.new('ShaderNodeOutputMaterial')
-            texImageNode = new_material.node_tree.nodes.new('ShaderNodeTexImage')
+            bsdfNode = new_material.node_tree.nodes.new("ShaderNodeBsdfPrincipled")
+            outputNode = new_material.node_tree.nodes.new("ShaderNodeOutputMaterial")
+            texImageNode = new_material.node_tree.nodes.new("ShaderNodeTexImage")
             texImageNode.name = fileName
-            texImageNode.image = bpy.data.images.load(directory + "\\" + fileName + fileExtension, check_existing=True)
+            texImageNode.image = bpy.data.images.load(
+                directory + "\\" + fileName + fileExtension, check_existing=True
+            )
 
             # create node links
-            new_material.node_tree.links.new(bsdfNode.outputs['BSDF'], outputNode.inputs['Surface'])
-            new_material.node_tree.links.new(bsdfNode.inputs['Base Color'], texImageNode.outputs['Color'])
+            new_material.node_tree.links.new(
+                bsdfNode.outputs["BSDF"], outputNode.inputs["Surface"]
+            )
+            new_material.node_tree.links.new(
+                bsdfNode.inputs["Base Color"], texImageNode.outputs["Color"]
+            )
 
             # some params
-            bsdfNode.inputs['Roughness'].default_value = 0
-            bsdfNode.inputs['Specular'].default_value = 0
+            bsdfNode.inputs["Roughness"].default_value = 0
+            bsdfNode.inputs["Specular"].default_value = 0
 
         return {"FINISHED"}
